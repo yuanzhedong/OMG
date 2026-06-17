@@ -55,6 +55,9 @@ def test_materialized_dataset_returns_generation_sample(tmp_path):
         encoding="utf-8",
     )
     (split_root / "index.jsonl").write_text(json.dumps({"shard": "shard_00000.npz", "offset": 0}) + "\n", encoding="utf-8")
+    (split_root / "summary.json").write_text(
+        json.dumps({"samples": 1, "shards": 1, "shard_size": 1}), encoding="utf-8"
+    )
 
     dataset = MaterializedG1MotionDataset(root=root, split="train")
     sample = dataset[0]

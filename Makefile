@@ -8,7 +8,7 @@ EXP ?= 100m
 DATA ?= omg_data
 TRAINER ?= 1gpu
 
-.PHONY: venv install install-cn install-dev compile compose smoke test
+.PHONY: venv install install-cn install-dev compile compose smoke smoke-synth test
 
 venv:
 	$(UV) venv --python 3.10 .venv
@@ -31,6 +31,15 @@ compose:
 
 smoke:
 	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m omg.cli.generation.train exp=$(EXP) data=$(DATA) logger=none trainer=$(TRAINER) data.limit_each_trainset=2 trainer.max_steps=2 trainer.limit_val_batches=0 trainer.num_sanity_val_steps=0
+
+# End-to-end smoke train on generated synthetic data (no real OMG-Data needed).
+# Verifies the full training loop runs. Output quality is meaningless.
+smoke-synth:
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) scripts/dev/make_synthetic_smoke_data.py
+	PYTHONPATH=$(PYTHONPATH) TOKENIZERS_PARALLELISM=false $(PYTHON) -m omg.cli.generation.train \
+		exp=$(EXP) data=omg_data_smoke trainer=1gpu logger=none callbacks=none \
+		model.text_encoder=null exp_name=smoke_synth \
+		trainer.max_steps=2 trainer.limit_val_batches=0 trainer.num_sanity_val_steps=0
 
 test:
 	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m pytest -q
