@@ -6,6 +6,7 @@ __pycache__/
 .ruff_cache/
 .cache/
 .venv/
+.venv-cu128/
 outputs*/
 wandb/
 logs/
