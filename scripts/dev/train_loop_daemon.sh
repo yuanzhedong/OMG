@@ -13,7 +13,7 @@ set -uo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 REPO="$(pwd)"
 STOP=/tmp/omg_train_loop.stop
-SIZES=(50m 100m 300m 500m 1b)
+SIZES=(50m 100m 300m)   # 500m/1b dropped: impractically slow + 1b diverges on 40 clips
 i=0
 
 echo "[loop] daemon start $(date) pid=$$"

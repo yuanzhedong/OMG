@@ -117,3 +117,47 @@ Generated 4 prompts; motion signatures (4 s clips) differ exactly as expected:
 Run > walk in distance; dance = most limb activity + least travel. This is from only
 1000 training steps — quality improves with the full run. Hero videos in
 `outputs_generate/<prompt>/50m/lafan1_50m_demo/*.mp4`.
+
+## Reproduction FAQ (dataset, blockers, what's in the repo)
+
+**Did the paper release the dataset (OMG-Data)?**
+Not yet. The README release checklist leaves OMG-Data, pretrained checkpoints, and the evaluator
+checkpoint unchecked, and the docs point to Hugging Face with placeholder `<org>/OMG-Data` URLs —
+wired up but not posted. So it's *promised, pending*, not "never."
+
+**If it's not released, how do I obtain training data?**
+OMG-Data is a curation of ~19 already-public datasets retargeted to G1, so the raw motion is largely
+obtainable today:
+- Unitree LAFAN1→G1 (what we used) — public mirror `lvhaidong/LAFAN1_Retargeting_Dataset`.
+- `bones-studio/seed` (BONES-SEED = OMG's `bones_seed`, 142k G1 clips **with captions**) — best option,
+  but **gated**: request access on HF, accept terms, add a token; 23.5 GB `g1.tar.gz` + temporal labels.
+- AMASS→G1 (`fleaven/Retargeted_AMASS_for_robotics`, `openhe/g1-retargeted-motions`) — public but
+  format-mismatched (23-DOF / joint-positions vs OMG's 29-DOF `qpos_36`); needs a careful remap/IK.
+The unreleased value-add is the unified retarget + filtering + multimodal labeling + materialization.
+
+**Main blockers to reproducing the paper's numbers:**
+1. No OMG-Data → can't train at the paper's data/scale.
+2. No pretrained checkpoints → can't run the paper's model.
+3. No evaluator checkpoint → can't compute distribution/retrieval metrics (FID, R-precision, etc.).
+4. External weights not redistributed: HoloMotion tracker (download separately), T5 encoders (HF).
+5. `g1_125d_stats.json` normalization file must be generated from data first.
+6. torch cu124 doesn't support Blackwell (sm_120) — needs a cu128 build (4090s are fine on cu124).
+7. A few stale tests (we fixed 3; see `docs/known_test_issues.md`).
+8. Materialized data is large (hundreds of GB).
+
+**What the repo INCLUDES:** training code (Lightning+Hydra, diffusion DiT 50M–1B), inference/generation
+(text/audio/human-ref, DDIM+CFG, ONNX export), benchmark code, pipeline modes (diffusion-only,
+tracker-only, sync, async, offline-track), sim-to-real deployment, G1 assets (URDF, kinematics, MuJoCo).
+
+**What the repo does NOT include:** OMG-Data (+ materialized), pretrained generation checkpoints,
+pretrained evaluator checkpoint, the `g1_125d_stats.json` file, HoloMotion tracker weights, T5 weights.
+
+**Can I reproduce results today?** The headline benchmark numbers — no (need the unreleased data +
+checkpoints + evaluator). The system and its behavior — yes (this demo), plus the scaling thesis.
+
+**Is this "the paper's model"?** No — same architecture/training code; our weights trained from scratch
+on 40 public G1 clips, with a frozen pretrained T5 and a pretrained HoloMotion tracker. No released
+OMG checkpoint exists yet to compare against.
+
+**Biggest next lever:** HF access to `bones_seed` (text-rich, 142k clips) → train the DiT on it →
+much better generalization and more trackable references. Data is the lever; the code is ready.
