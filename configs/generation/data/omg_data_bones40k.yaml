@@ -1,0 +1,81 @@
+# Real G1 data: BONES-SEED subset, adapted by scripts/dev/adapt_bones_seed.py.
+# Text-to-motion with rich per-segment captions. Source format (UnifiedG1MotionIndex).
+_target_: omg.data.datamodule.GenerationDataModule
+limit_each_trainset: null
+train_subset_ratio: null
+rotation_representation: ${representation.rotation_representation}
+dataset_opts:
+  train:
+    bones_seed_40k:
+      _target_: omg.data.g1_motion.G1MotionDataset
+      sequence_duration: 2.0
+      num_prev_states: ${representation.num_prev_states}
+      canonical_frame_idx: ${representation.canonical_frame_idx}
+      fps: 30.0
+      sample_by_segment: true
+      include_style_in_caption: true
+      skip_missing_labels: false
+      dataset_root: ${paths.data_root}/omg_data/bones_seed_40k/g1
+      info_path: ${paths.data_root}/omg_data/bones_seed_40k/info.yaml
+      labels_root: ${paths.data_root}/omg_data/bones_seed_40k/labels
+      split: train
+      use_text: true
+      use_audio: false
+      audio_dim: 35
+      use_human_motion: false
+      human_motion_dim: 66
+  val:
+    bones_seed_40k_val:
+      _target_: omg.data.g1_motion.G1MotionDataset
+      sequence_duration: 2.0
+      num_prev_states: ${representation.num_prev_states}
+      canonical_frame_idx: ${representation.canonical_frame_idx}
+      fps: 30.0
+      sample_by_segment: true
+      include_style_in_caption: true
+      skip_missing_labels: false
+      dataset_root: ${paths.data_root}/omg_data/bones_seed_40k/g1
+      info_path: ${paths.data_root}/omg_data/bones_seed_40k/info.yaml
+      labels_root: ${paths.data_root}/omg_data/bones_seed_40k/labels
+      split: val
+      use_text: true
+      use_audio: false
+      audio_dim: 35
+      use_human_motion: false
+      human_motion_dim: 66
+      eval_window_policy: uniform
+      eval_num_windows: 3
+  test:
+    bones_seed_40k_test:
+      _target_: omg.data.g1_motion.G1MotionDataset
+      sequence_duration: 2.0
+      num_prev_states: ${representation.num_prev_states}
+      canonical_frame_idx: ${representation.canonical_frame_idx}
+      fps: 30.0
+      sample_by_segment: true
+      include_style_in_caption: true
+      skip_missing_labels: false
+      dataset_root: ${paths.data_root}/omg_data/bones_seed_40k/g1
+      info_path: ${paths.data_root}/omg_data/bones_seed_40k/info.yaml
+      labels_root: ${paths.data_root}/omg_data/bones_seed_40k/labels
+      split: test
+      use_text: true
+      use_audio: false
+      audio_dim: 35
+      use_human_motion: false
+      human_motion_dim: 66
+      eval_window_policy: uniform
+      eval_num_windows: 3
+loader_opts:
+  train:
+    batch_size: 64
+    num_workers: 8
+    prefetch_factor: 4
+  val:
+    batch_size: 16
+    num_workers: 2
+    prefetch_factor: 1
+  test:
+    batch_size: 16
+    num_workers: 2
+    prefetch_factor: 1

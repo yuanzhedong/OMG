@@ -30,7 +30,10 @@ def test_forward_body_positions_matches_full_fk():
 
 
 def test_prev_state_features_accept_pos_only_fk():
-    representation = G1MotionRepresentation(num_prev_states=2)
+    # Match the released 125D rot6d stats file at the default stats_path.
+    representation = G1MotionRepresentation(
+        num_prev_states=2, feat_dim=125, rotation_representation="rot6d"
+    )
     qpos = _sample_qpos((4, 2))
     fk = representation.kinematics.forward_kinematics(qpos)
     fast_body_pos = representation.kinematics.forward_body_positions(qpos)

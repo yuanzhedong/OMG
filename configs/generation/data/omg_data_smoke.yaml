@@ -1,0 +1,35 @@
+# Synthetic smoke dataset (materialized format). For pipeline validation only;
+# generate it with scripts/dev/make_synthetic_smoke_data.py. Not real OMG-Data.
+_target_: omg.data.datamodule.GenerationDataModule
+limit_each_trainset: null
+train_subset_ratio: null
+rotation_representation: ${representation.rotation_representation}
+dataset_opts:
+  train:
+    smoke_materialized:
+      _target_: omg.data.materialized.MaterializedG1MotionDataset
+      root: ${paths.repo_root}/data/_smoke/materialized/smoke_dataset
+      split: train
+  val:
+    smoke_materialized_val:
+      _target_: omg.data.materialized.MaterializedG1MotionDataset
+      root: ${paths.repo_root}/data/_smoke/materialized/smoke_dataset
+      split: val
+  test:
+    smoke_materialized_test:
+      _target_: omg.data.materialized.MaterializedG1MotionDataset
+      root: ${paths.repo_root}/data/_smoke/materialized/smoke_dataset
+      split: test
+loader_opts:
+  train:
+    batch_size: 4
+    num_workers: 0
+    prefetch_factor: null
+  val:
+    batch_size: 4
+    num_workers: 0
+    prefetch_factor: null
+  test:
+    batch_size: 4
+    num_workers: 0
+    prefetch_factor: null
